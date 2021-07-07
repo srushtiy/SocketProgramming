@@ -1,0 +1,38 @@
+
+Full name: Srushti Yadhunath
+Student ID: yadhunat
+
+THe AWS enables user to use 3 functions to enquire the 3 backend servers: 
+1) prefix - the user can specify a string and all word beginning wiht this phrase will be listed 
+2) search - the user can specify a string and the exact match and meaning will be looked up 
+3) suffix - the user can specify a stirng and words ending with this phrase will be listed 
+
+Project files:
+1) ServerA, ServerB and ServerC - all 3 work as back end servers which communicate with the AWS through UDP connection and are always on by means of the while loop.
+They set up a UDP connection on 3 different ports and each perform a search on 3 different text files given in the project function. To carry out the functions, 4 C++ functions
+have been written 
+	- prefix - this function carries out the prefix function on a given user input string and returns a vector or array of strings
+	- suffix - this function carries out the suffix function on a given user input string and returns a vector or array of strings
+	- search - this conducts an exact word search on the given string and returns the meaning as a single string
+	- searchOneDist - this conducts a search for one distance or character change to a given string and returns a vector of strings consisting of the altered word and its meaning
+Once the results are fetched, they are sent in a loop to the AWS server using UDP connection. To indicate to the AWS server that flow of characters is ended an end string namely "$" is sent.
+The AWS server stops reading once this character is received.  
+
+2) AWS - The AWS sets up a TCP server connection at the start. Once the while loop starts, it reads user input through TCP connection with the client. Inside this loop, it sets up 3 UDP connections with  the backend servers. Using 3 separate loops, the user input and function is sent to the 3 backend servers. The results are then received and stored in the 3 separate vectors of strings namely serverA_dataout, serverB_dataout and serverC_dataout. Depending on the user function the results are added to a final vector called all_Results which is then sent in a loop to the client. Within this while loop, the AWS sets up a connection with the monitor and send the results to the monitor as well through TCP connection. The AWS server remains always on by means of the while(true) loop and  in this manner it is always listening to connections. To indicate that the AWS has completed sending the results to the client and monitor, the end string "$" is sent. The client and monitor stop receiving after this and proceed to print the results. 
+
+3) Client - The client reads user input through the command line and stores these in variables. It then sets up a TCP connection with the AWS server and sends results over this connection.The accumulated results are stored in a vector called all_results which are printed out in the required format depending on the user input function specified. 
+4) Monitor - The monitor sets up a TCP connection with the AWS server. Although it has nothing to send, it sets up a while loop and listens to the AWS server for it to send results. Results received are stored in a vector called results. Depending on the user function input, the results are printed accordingly. 
+
+Format of messages exchanged: 
+From the user to AWS, the message is sent as a char * or pointer. The user input is stored in a vector of strings and we loop through this vector when sending the characters. The "$" is used to indicate that we are done sending.
+From the AWS server to the 3 UDP servers, messages of 2 strings are sent and the "$" sign is used to mark the end of the loop. 
+From the 3 UDP servers to the AWS, messages or results are sent in an array and the AWS stores these into arrays or vectors of strings. 
+The AWS compiles these into one vector and sends them again in a loop to the client and monitor. The "$" string is used to indicate the end of the loop.
+
+Any idiosyncrasies: 
+1)The monitor is always on however after reading the first result even though it continues listening it does not receive the results from AWS. The monitor needs to be terminated and started again 
+in order for the second set of results to be read. 
+2)The one distance search sometimes returns the same word as the search function. This may be due to lowercase and upper case differences when reading in text files.
+ 
+Reused code:
+TCP and UDP connection setup - adapted from BEEJUS networking guide
